@@ -38,7 +38,48 @@ Updates require a solid solution to prevent two users editing the same recipe. A
 optimistic locking by provding an ETAG header. The backend can validate is the recipe has been updates since the user
 fetche the recipe.
 
-Unit test 
+### Unit test
+
+Clearly this project needs unit tests, but since there was limited time these where skipped
+
+* The repositories should be tested with DataJPATest (mainly the query part, integration tests will cover the rest..)
+* The Controller should be tested with MockMVC (focus on validations, integration tests will cover the rest...)
+* Mockito should be used for mocking
+
+## Sample requests
+
+### create Recipe
+
+```shell
+curl -i -X POST \
+-H "Authorization:Basic dXNlcjE6dXNlcjFwYXNz" \
+-H "Content-Type:application/json" \
+-d \
+'{
+"name": "bbq burger",
+"vegetarian": "false",
+"ingredients":
+[
+{
+"name": "peper",
+"quantity":2
+}],
+"serves": 2,
+"instructions" : "something"
+}
+' \
+'http://localhost:8080/recipes'
+
+```
+
+### Get Recipes without salmon and with over in the instructions
+
+```shell
+curl -i -X GET \
+   -H "Authorization:Basic dXNlcjE6dXNlcjFwYXNz" \
+ 'http://localhost:8080/recipes?search=ingredient!salmon%2Cvegetarian%3Afalse%2Cinstructions%3Aoven'
+
+```
 
 
 
