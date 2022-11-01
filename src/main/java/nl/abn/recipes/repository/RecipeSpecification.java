@@ -4,21 +4,22 @@ import lombok.RequiredArgsConstructor;
 import nl.abn.recipes.domein.Ingredient;
 import nl.abn.recipes.domein.Recipe;
 import nl.abn.recipes.domein.SearchCriteria;
+import nl.abn.recipes.domein.SearchOperationEnum;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * JPA recipe Specification for dynamic building queries for fetching recipes based on {@link SearchCriteria}
+ */
 @RequiredArgsConstructor
 public class RecipeSpecification implements Specification<Recipe> {
     public static final String RECIPE_TABLE = "recipe";
     public static final String INGREDIENTS_TABLE = "ingredients";
     private static final String INGREDIENT_COLUMN = "ingredient";
-    private static final String LARGER_THEN = ">";
-    private static final String LESS_THEN = "<";
-    private static final String LIKE = ":";
-    private static final String NOT_LIKE = "!";
+
     private final SearchCriteria criteria;
 
     @Override
@@ -35,15 +36,15 @@ public class RecipeSpecification implements Specification<Recipe> {
     }
 
     private Predicate build(final CriteriaQuery<?> query, final CriteriaBuilder builder, From<?, ?> from) {
-        if (criteria.getOperation().equalsIgnoreCase(LARGER_THEN)) {
+        if (criteria.getOperation() == (SearchOperationEnum.GREATER_THEN)) {
             return buildLargerThenPredicate(builder, from);
-        } else if (criteria.getOperation().equalsIgnoreCase(LESS_THEN)) {
+        } else if (criteria.getOperation() == SearchOperationEnum.LESS_THEN) {
             return buildLessThenPredicate(builder, from);
-        } else if (criteria.getOperation().equalsIgnoreCase(LIKE)) {
-            return buildLikePredicate(builder, from);
-        } else if (criteria.getOperation().equalsIgnoreCase(LIKE) && criteria.getKey().equals(INGREDIENT_COLUMN)) {
+        } else if (criteria.getOperation() == SearchOperationEnum.LIKE && criteria.getKey().equals(INGREDIENT_COLUMN)) {
             return buildIngredientPredicate(query, builder, from);
-        } else if (criteria.getOperation().equalsIgnoreCase(NOT_LIKE)) {
+        } else if (criteria.getOperation() == SearchOperationEnum.LIKE) {
+            return buildLikePredicate(builder, from);
+        } else if (criteria.getOperation() == SearchOperationEnum.NOT_LIKE) {
             return buildNotLikePredicate(builder, from);
         }
         return null;

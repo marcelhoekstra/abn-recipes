@@ -3,6 +3,7 @@ package nl.abn.recipes.repository;
 import lombok.val;
 import nl.abn.recipes.domein.Recipe;
 import nl.abn.recipes.domein.SearchCriteria;
+import nl.abn.recipes.domein.SearchOperationEnum;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class RecipeSpecificationsBuilder {
         params = new ArrayList<>();
     }
 
-    public RecipeSpecificationsBuilder with(String key, String operation, Object value) {
+    public RecipeSpecificationsBuilder with(String key, SearchOperationEnum operation, Object value) {
         params.add(new SearchCriteria(key, operation, value));
         return this;
     }

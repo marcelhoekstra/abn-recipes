@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import nl.abn.recipes.domein.Ingredient;
 import nl.abn.recipes.domein.Recipe;
+import nl.abn.recipes.domein.SearchOperationEnum;
 import nl.abn.recipes.repository.RecipeSpecificationsBuilder;
 import nl.abn.recipes.repository.RecipesRepository;
 import nl.abn.recipes.web.dto.IngredientDto;
@@ -30,20 +31,14 @@ import java.util.stream.StreamSupport;
 @RestController
 @Transactional
 @RequestMapping("/recipes")
-public class RecipesEndpoint {
+public class RecipesController {
     private final RecipesRepository recipesRepository;
 
     @GetMapping
     public List<RecipeDto> find(@RequestParam(value = "search", required = false) String search) {
         if (StringUtils.hasText(search)) {
-            RecipeSpecificationsBuilder builder = new RecipeSpecificationsBuilder();
-            Pattern pattern = Pattern.compile("(\\w+?)(!|:|<|>)(\\w+?),");
-            Matcher matcher = pattern.matcher(search + ",");
-            while (matcher.find()) {
-                builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
-            }
+            Specification<Recipe> spec = buildRecipeSpecification(search);
 
-            Specification<Recipe> spec = builder.build();
             val recipes = recipesRepository.findAll(spec);
             return recipes.stream()
                     .map(this::toDto)
@@ -54,6 +49,23 @@ public class RecipesEndpoint {
                     .map(this::toDto)
                     .toList();
         }
+    }
+
+    /**
+     * Convert the search string to a JPA specification by parsing the string with the regex.
+     * <p>
+     * It parses the string by extracting the search operations {@link SearchOperationEnum}
+     */
+    private Specification<Recipe> buildRecipeSpecification(String search) {
+        RecipeSpecificationsBuilder builder = new RecipeSpecificationsBuilder();
+
+        Pattern pattern = Pattern.compile("(\\w+?)(!|:|<|>)(\\w+?),");
+        Matcher matcher = pattern.matcher(search + ",");
+        while (matcher.find()) {
+            builder.with(matcher.group(1), SearchOperationEnum.fromText(matcher.group(2)), matcher.group(3));
+        }
+
+        return builder.build();
     }
 
     @GetMapping("/{id}")
