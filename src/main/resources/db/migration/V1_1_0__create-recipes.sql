@@ -7,13 +7,13 @@ alter table ingredients add constraint FK7p08vcyn6wf7fd6qp79yy2jrwg foreign key 
 ALTER TABLE recipes ADD CONSTRAINT NAME_UNIQUE UNIQUE(name);
 
 
-insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('the instructions', 'ç', 4, false, 'marcel', 0, 1000);
-insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salt', '1 gram', 0, (NEXTVAL('ingredient_generator')), 1000);
-
-insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('....oven....', 'spagetti', 4, false, 'marcel', 0, 1001);
-insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salt', '1 gram', 0, (NEXTVAL('ingredient_generator')), 1001);
-insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('mushrooms', '200 gram', 0, (NEXTVAL('ingredient_generator')), 1001);
-
-insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('....oven', 'lasange', 4, false, 'marcel', 0, 1002);
-insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salmon', '500 gram', 0, (NEXTVAL('ingredient_generator')), 1002);
-insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('paprika', '1', 0, (NEXTVAL('ingredient_generator')), 1002);
+--insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('the instructions', 'ç', 4, false, 'marcel', 0, 1000);
+--insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salt', '1 gram', 0, (NEXTVAL('ingredient_generator')), 1000);
+--
+--insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('....oven....', 'spagetti', 4, false, 'marcel', 0, 1001);
+--insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salt', '1 gram', 0, (NEXTVAL('ingredient_generator')), 1001);
+--insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('mushrooms', '200 gram', 0, (NEXTVAL('ingredient_generator')), 1001);
+--
+--insert into recipes (instructions, name, serves, vegetarian, author, version, id) values ('....oven', 'lasange', 4, false, 'marcel', 0, 1002);
+--insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('salmon', '500 gram', 0, (NEXTVAL('ingredient_generator')), 1002);
+--insert into ingredients (ingredient, quantity, version, id, recipe_id) values ('paprika', '1', 0, (NEXTVAL('ingredient_generator')), 1002);

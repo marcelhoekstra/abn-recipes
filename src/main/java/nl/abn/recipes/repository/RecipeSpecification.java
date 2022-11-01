@@ -1,6 +1,7 @@
 package nl.abn.recipes.repository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import nl.abn.recipes.domein.Ingredient;
 import nl.abn.recipes.domein.Recipe;
 import nl.abn.recipes.domein.SearchCriteria;
@@ -36,12 +37,12 @@ public class RecipeSpecification implements Specification<Recipe> {
     }
 
     private Predicate build(final CriteriaQuery<?> query, final CriteriaBuilder builder, From<?, ?> from) {
-        if (criteria.getOperation() == (SearchOperationEnum.GREATER_THEN)) {
+        if (criteria.getKey().equals(INGREDIENT_COLUMN)) {
+            return buildIngredientPredicate(query, builder, from);
+        } else if (criteria.getOperation() == (SearchOperationEnum.GREATER_THEN)) {
             return buildLargerThenPredicate(builder, from);
         } else if (criteria.getOperation() == SearchOperationEnum.LESS_THEN) {
             return buildLessThenPredicate(builder, from);
-        } else if (criteria.getOperation() == SearchOperationEnum.LIKE && criteria.getKey().equals(INGREDIENT_COLUMN)) {
-            return buildIngredientPredicate(query, builder, from);
         } else if (criteria.getOperation() == SearchOperationEnum.LIKE) {
             return buildLikePredicate(builder, from);
         } else if (criteria.getOperation() == SearchOperationEnum.NOT_LIKE) {
@@ -86,18 +87,21 @@ public class RecipeSpecification implements Specification<Recipe> {
         Root<Ingredient> subqueryRoot = subquery.from(Ingredient.class);
         subquery.select(subqueryRoot.join(RECIPE_TABLE));
 
-        if (from.get(criteria.getKey()).getJavaType() == String.class) {
-            subquery.where(builder.and(builder.like(subqueryRoot.get(INGREDIENT_COLUMN),
-                    "%" + criteria.getValue() + "%")));
-        } else {
-            subquery.where(builder.and(builder.equal(subqueryRoot.get(INGREDIENT_COLUMN),
-                    criteria.getValue())));
-        }
+        subquery.where(builder.and(builder.like(subqueryRoot.get(INGREDIENT_COLUMN),
+                "%" + criteria.getValue() + "%")));
+
         List<Expression<?>> groupByParams = new ArrayList<>();
         groupByParams.add(subqueryRoot.get(RECIPE_TABLE));
         subquery.groupBy(groupByParams);
         subquery.having(builder.gt(builder.count(subqueryRoot.get(RECIPE_TABLE)), 0));
 
-        return from.get(RECIPE_TABLE).in(subquery).not();
+        val predicate = from.get(RECIPE_TABLE).in(subquery);
+        if (criteria.getOperation() == SearchOperationEnum.LIKE) {
+            return predicate;
+        } else if (criteria.getOperation() == SearchOperationEnum.NOT_LIKE) {
+            return predicate.not();
+        } else {
+            throw new IllegalArgumentException("only LIKE and NOT LIKE supported");
+        }
     }
 }

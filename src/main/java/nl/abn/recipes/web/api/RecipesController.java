@@ -51,6 +51,27 @@ public class RecipesController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<RecipeDto> findById(@PathParam(value = "id") Long id) {
+        return recipesRepository.findById(id)
+                .map((recipe) -> ResponseEntity.ok().body(toDto(recipe)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> create(@RequestBody @Valid final RecipeDto recipeDto, final Principal principal) {
+        val recipe = toDomain(recipeDto, principal.getName());
+        recipesRepository.save(recipe);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(recipe.getId())
+                .toUri();
+        return ResponseEntity.created(location)
+                .build();
+    }
+
     /**
      * Convert the search string to a JPA specification by parsing the string with the regex.
      * <p>
@@ -68,32 +89,11 @@ public class RecipesController {
         return builder.build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RecipeDto> findById(@PathParam(value = "id") Long id) {
-        return recipesRepository.findById(id)
-                .map((recipe) -> ResponseEntity.ok().body(toDto(recipe)))
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid final RecipeDto recipeDto, final Principal principal) {
-        val recipe = transform(recipeDto, principal.getName());
-        recipesRepository.save(recipe);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(recipe.getId())
-                .toUri();
-        return ResponseEntity.created(location)
-                .build();
-    }
-
-    private Recipe transform(final RecipeDto dto, final String username) {
+    private Recipe toDomain(final RecipeDto dto, final String username) {
         return Recipe.builder()
                 .name(dto.getName())
                 .instructions(dto.getInstructions())
-                .ingredients(transform(dto.getIngredients()))
+                .ingredients(toDomain(dto.getIngredients()))
                 .author(username)
                 .build();
     }
@@ -106,28 +106,28 @@ public class RecipesController {
                 .build();
     }
 
-    private Set<Ingredient> transform(final Set<IngredientDto> ingredients) {
+    private Set<Ingredient> toDomain(final Set<IngredientDto> ingredients) {
         return ingredients.stream()
-                .map(this::transform)
+                .map(this::toDomain)
                 .collect(Collectors.toSet());
 
     }
 
     private Set<IngredientDto> toDto(final Set<Ingredient> ingredients) {
         return ingredients.stream()
-                .map(this::transform)
+                .map(this::toDomain)
                 .collect(Collectors.toSet());
 
     }
 
-    private Ingredient transform(final IngredientDto ingredientDto) {
+    private Ingredient toDomain(final IngredientDto ingredientDto) {
         return Ingredient.builder()
                 .ingredient(ingredientDto.getName())
                 .quantity(ingredientDto.getQuantity())
                 .build();
     }
 
-    private IngredientDto transform(final Ingredient ingredient) {
+    private IngredientDto toDomain(final Ingredient ingredient) {
         return IngredientDto.builder()
                 .name(ingredient.getIngredient())
                 .build();

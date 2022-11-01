@@ -34,9 +34,9 @@ search fields can be added easily this way.
 * Delete recipes
 * Unit tests
 
-Updates require a solid solution to prevent two users editing the same recipe. A common solutions is the use of
-optimistic locking by provding an ETAG header. The backend can validate is the recipe has been updates since the user
-fetche the recipe.
+Updates require a solid solution to prevent two users editing the same recipe. A common solution is the use of
+optimistic locking by providing an ETAG header. The backend can validate if the recipe has been updated since the user
+fetched the recipe.
 
 ### Unit test
 
