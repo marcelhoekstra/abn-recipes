@@ -43,7 +43,7 @@ fetched the recipe.
 Clearly this project needs unit tests, but since there was limited time these where skipped
 
 * The repositories should be tested with DataJPATest (mainly the query part, integration tests will cover the rest..)
-* The Controller should be tested with MockMVC (focus on validations, integration tests will cover the rest...)
+* The Controller should be tested with mocks (focus on mappings, validations, integration tests will cover the rest...)
 * Mockito should be used for mocking
 
 ## Sample requests
