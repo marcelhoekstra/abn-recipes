@@ -36,6 +36,7 @@ public class RecipesController {
 
     @GetMapping
     public List<RecipeDto> find(@RequestParam(value = "search", required = false) String search) {
+
         if (StringUtils.hasText(search)) {
             Specification<Recipe> spec = buildRecipeSpecification(search);
 
@@ -130,6 +131,7 @@ public class RecipesController {
     private IngredientDto toDomain(final Ingredient ingredient) {
         return IngredientDto.builder()
                 .name(ingredient.getIngredient())
+                .quantity(ingredient.getQuantity())
                 .build();
     }
 
